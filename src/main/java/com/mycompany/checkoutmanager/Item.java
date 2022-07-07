@@ -14,35 +14,37 @@ public class Item {
     //also making everything public here because this will not interface beyond the uncc network and i dont get software dev pay
     // getters and setters just in case and habit
     
+    // note actually items are checked out by students and store their SID. idk what i was thinking making it a bool
+    
     public String name;
-    public boolean checkedOut;
+    public int sid;
     
     public Item() {
         this.name = "default";
-        this.checkedOut = false;
+        this.sid = -1;
     }
     public Item(String name) {
         this.name = name;
-        this.checkedOut = false;
+        this.sid = -1;
     }
-    public Item (String name, boolean checkedOut) {
+    public Item (String name, int sid) {
         this.name = name;
-        this.checkedOut = checkedOut;
+        this.sid = sid;
     }
     
     public String getName() {
         return this.name;
     }
-    public boolean getCheckedOut() {
-        return this.checkedOut;
+    public int getCheckedOut() {
+        return this.sid;
     }
     
     public void setName(String newname) {
         this.name = newname;
     }
     
-    public void setCheckedOut(boolean newval) {
-        this.checkedOut = newval;
+    public void setCheckedOut(int newval) {
+        this.sid = newval;
     }
     
 }
