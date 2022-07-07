@@ -8,7 +8,7 @@ package com.mycompany.checkoutmanager;
  *
  * @author mbath
  */
-public class Item {
+public class Item implements java.io.Serializable{
     // items are the things you check in and out for students.
     // i didnt want to make this a class but it has two attributes that dont fit into a 2d array (string and bool)
     //also making everything public here because this will not interface beyond the uncc network and i dont get software dev pay

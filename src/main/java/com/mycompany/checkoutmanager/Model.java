@@ -19,11 +19,7 @@ public class Model implements java.io.Serializable{
         items = new ArrayList<>();
     }
     
-    // test code remove later
     public void test() {
-        items.add(new Item("test1"));
-        items.add(new Item("test2"));
-        items.add(new Item("test3"));
     }
     
     public ArrayList getItems() {

@@ -4,6 +4,8 @@
  */
 package com.mycompany.checkoutmanager;
 import java.io.*;
+import java.util.ArrayList;
+import javax.swing.*;
 /**
  *
  * @author mbath
@@ -12,15 +14,27 @@ public class MainFrame extends javax.swing.JFrame {
 
     public static Model model;
     
+    public static ArrayList<Integer> listSelections;
+    
+    private static DefaultListModel listModel = new DefaultListModel();
+    
     /**
      * Creates new form MainFrame
      */
     public MainFrame() {
         initComponents();
+        model = new Model();
+        this.listSelections = new ArrayList<>();
+        updateList();
     }
     public MainFrame(Model model) {
         initComponents();
         this.model = model;
+        this.listSelections = new ArrayList<>();
+        
+        // populate jlist with model immediately
+        updateList();
+        //listModel.addElement("testyyy");
     }
 
     /**
@@ -44,16 +58,18 @@ public class MainFrame extends javax.swing.JFrame {
         jRadioButton_all = new javax.swing.JRadioButton();
         jRadioButton_out = new javax.swing.JRadioButton();
         jRadioButton_in = new javax.swing.JRadioButton();
-        jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
-        jMenu2 = new javax.swing.JMenu();
+        jMenuBar2 = new javax.swing.JMenuBar();
+        jMenu = new javax.swing.JMenu();
+        jMenuItem_add = new javax.swing.JMenuItem();
+        jMenuItem_remove = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jList_items.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
+        jList_items.setModel(listModel);
+        jList_items.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jList_itemsValueChanged(evt);
+            }
         });
         jScrollPane1.setViewportView(jList_items);
 
@@ -89,13 +105,32 @@ public class MainFrame extends javax.swing.JFrame {
         buttonGroup_display.add(jRadioButton_in);
         jRadioButton_in.setText("Display Available");
 
-        jMenu1.setText("Add Item");
-        jMenuBar1.add(jMenu1);
+        jMenu.setText("Update Items List");
+        jMenu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuActionPerformed(evt);
+            }
+        });
 
-        jMenu2.setText("Delete Item");
-        jMenuBar1.add(jMenu2);
+        jMenuItem_add.setText("Add Item");
+        jMenuItem_add.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem_addActionPerformed(evt);
+            }
+        });
+        jMenu.add(jMenuItem_add);
 
-        setJMenuBar(jMenuBar1);
+        jMenuItem_remove.setText("Remove Selected Items");
+        jMenuItem_remove.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem_removeActionPerformed(evt);
+            }
+        });
+        jMenu.add(jMenuItem_remove);
+
+        jMenuBar2.add(jMenu);
+
+        setJMenuBar(jMenuBar2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -162,11 +197,55 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jButton_outActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_outActionPerformed
         // TODO add your handling code here:
+        for (int index : listSelections) {
+            
+        }
     }//GEN-LAST:event_jButton_outActionPerformed
 
     private void jButton_inActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_inActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton_inActionPerformed
+
+    private void jMenuItem_removeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_removeActionPerformed
+        // TODO add your handling code here:
+        int execute = JOptionPane.showConfirmDialog(null, "This action permanently deletes all of the currently selected items in the list. Do you wish to continue?", "Confirm", JOptionPane.YES_NO_OPTION);
+        System.out.println(execute);
+        if (execute == 0) {
+            ArrayList<String> itemnames = new ArrayList<>();
+            ArrayList<String> todelete = new ArrayList<>();
+            ArrayList<Item> items = model.getItems();
+            for (int i = 0; i < items.size(); i++){
+                itemnames.add(items.get(i).getName());
+            }
+            for (int index : listSelections) {
+                todelete.add(itemnames.get(index));
+            }
+            for (String item : todelete) {
+                model.removeItem(item);
+            }
+            updateList();
+        }
+    }//GEN-LAST:event_jMenuItem_removeActionPerformed
+
+    private void jMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuActionPerformed
+
+    private void jMenuItem_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_addActionPerformed
+        // TODO add your handling code here:
+        String name = JOptionPane.showInputDialog("New item:");
+        Item newItem = new Item(name);
+        model.addItem(newItem);
+        updateList();
+    }//GEN-LAST:event_jMenuItem_addActionPerformed
+
+    private void jList_itemsValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList_itemsValueChanged
+        // TODO add your handling code here:
+        listSelections.clear();
+        for (int index : jList_items.getSelectedIndices()) {
+            listSelections.add(index);
+        }
+    }//GEN-LAST:event_jList_itemsValueChanged
 
     /**
      * @param args the command line arguments
@@ -204,18 +283,30 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     // my methods here
-    public static void deser() {
+    public static void save() {
             try {
-            FileOutputStream fileOut = new FileOutputStream("/tmp/list.ser");
+            File f = new File("list.txt");
+            FileOutputStream fileOut = new FileOutputStream(f);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(model);
             out.close();
             fileOut.close();
-            System.out.printf("Serialized data is saved in /tmp/list.ser");
+            System.out.printf("Serialized data is saved in /tmp/list.txt");
          } catch (IOException i) {
             i.printStackTrace();
          }
      }
+    
+    public static void updateList() {
+        listModel.clear();
+        ArrayList<Item> items = model.getItems();
+        for (int i = 0; i < items.size(); i++){
+            listModel.addElement(items.get(i).getName());
+        }
+        
+        save();
+    }
+    
     //
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -226,9 +317,10 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel_filter;
     private javax.swing.JLabel jLabel_instructions;
     private javax.swing.JList<String> jList_items;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenu jMenu;
+    private javax.swing.JMenuBar jMenuBar2;
+    private javax.swing.JMenuItem jMenuItem_add;
+    private javax.swing.JMenuItem jMenuItem_remove;
     private javax.swing.JRadioButton jRadioButton_all;
     private javax.swing.JRadioButton jRadioButton_in;
     private javax.swing.JRadioButton jRadioButton_out;

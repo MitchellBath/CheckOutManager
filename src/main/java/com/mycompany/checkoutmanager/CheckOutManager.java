@@ -17,11 +17,12 @@ public class CheckOutManager {
         // deserialize model
         Model model = null;
         try {
-         FileInputStream fileIn = new FileInputStream("/tmp/list.ser");
-         ObjectInputStream in = new ObjectInputStream(fileIn);
-         model = (Model) in.readObject();
-         in.close();
-         fileIn.close();
+            File f = new File("list.txt");
+            FileInputStream fileIn = new FileInputStream(f);
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            model = (Model) in.readObject();
+            in.close();
+            fileIn.close();
       } catch (IOException i) {
          i.printStackTrace();
       } catch (ClassNotFoundException c) {
