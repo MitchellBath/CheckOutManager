@@ -18,6 +18,7 @@ public class MainFrame extends javax.swing.JFrame {
     
     private static DefaultListModel listModel = new DefaultListModel();
     private static String filterText;
+    private static int filterButtons;
     
     /**
      * Creates new form MainFrame
@@ -26,6 +27,7 @@ public class MainFrame extends javax.swing.JFrame {
         initComponents();
         model = new Model();        
         filterText = "";
+        filterButtons = 0;
         this.listSelections = new ArrayList<>();
         updateList();
     }
@@ -33,6 +35,7 @@ public class MainFrame extends javax.swing.JFrame {
         initComponents();
         this.model = model;
         filterText = "";
+        filterButtons = 0;
         this.listSelections = new ArrayList<>();
         
         // populate jlist with model immediately
@@ -118,12 +121,27 @@ public class MainFrame extends javax.swing.JFrame {
         buttonGroup_display.add(jRadioButton_all);
         jRadioButton_all.setSelected(true);
         jRadioButton_all.setText("Display All");
+        jRadioButton_all.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton_allActionPerformed(evt);
+            }
+        });
 
         buttonGroup_display.add(jRadioButton_out);
         jRadioButton_out.setText("Display Checked Out");
+        jRadioButton_out.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton_outActionPerformed(evt);
+            }
+        });
 
         buttonGroup_display.add(jRadioButton_in);
         jRadioButton_in.setText("Display Available");
+        jRadioButton_in.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton_inActionPerformed(evt);
+            }
+        });
 
         jMenu.setText("Update Items List");
         jMenu.addActionListener(new java.awt.event.ActionListener() {
@@ -285,6 +303,24 @@ public class MainFrame extends javax.swing.JFrame {
         updateList();
     }//GEN-LAST:event_jTextField_filterKeyReleased
 
+    private void jRadioButton_outActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton_outActionPerformed
+        // TODO add your handling code here:
+        filterButtons = 1;
+        updateList();
+    }//GEN-LAST:event_jRadioButton_outActionPerformed
+
+    private void jRadioButton_allActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton_allActionPerformed
+        // TODO add your handling code here:
+        filterButtons = 0;
+        updateList();
+    }//GEN-LAST:event_jRadioButton_allActionPerformed
+
+    private void jRadioButton_inActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton_inActionPerformed
+        // TODO add your handling code here:
+        filterButtons = 2;
+        updateList();
+    }//GEN-LAST:event_jRadioButton_inActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -348,8 +384,24 @@ public class MainFrame extends javax.swing.JFrame {
         for (Item item : items) {
             System.out.println(item.getName());
             if (item.getName().contains(filterText)) {
-                listModel.addElement(item.getName());
+                switch (filterButtons) {
+                case 0:
+                    listModel.addElement(item.getName());
+                    break;
+                case 1:
+                    if (item.getCheckedOut() != -1) {
+                        listModel.addElement(item.getName());                        
+                    }
+                    break;
+                case 2:
+                    if (item.getCheckedOut() == -1) {
+                        listModel.addElement(item.getName());                        
+                    }
+                    break;
+                }
+                
             }
+                
         }
 //        for (int i = 0; i < items.size(); i++){
 //            if (items.get(i).getName().contains(filterText)) {
