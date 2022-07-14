@@ -5,7 +5,8 @@
 package com.mycompany.checkoutmanager;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.awt.Desktop;
+import java.text.SimpleDateFormat;
 import javax.swing.*;
 /**
  *
@@ -20,6 +21,8 @@ public class MainFrame extends javax.swing.JFrame {
     private static DefaultListModel listModel = new DefaultListModel();
     private static String filterText;
     private static int filterButtons;
+    
+    public static File desklog;
     
     /**
      * Creates new form MainFrame
@@ -95,6 +98,11 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
         jButton_log.setText("Display Check In/Out Log");
+        jButton_log.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_logActionPerformed(evt);
+            }
+        });
 
         jTextField_filter.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -248,9 +256,17 @@ public class MainFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Invalid SID entered. Aborting action.");
             return;
         }
-        int sid = Integer.parseInt(sidraw);
+        int sid;
+        try {
+            sid = Integer.parseInt(sidraw);
+        }
+        catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Invalid SID entered. Aborting action.");
+            return;
+        }
         ArrayList<Item> items = model.getItems();
         for (int index : listSelections) {
+            deskLog("Checked out item " + items.get(index).getName() + " to SID " + sidraw);
             items.get(index).setCheckedOut(sid);
         }
         JOptionPane.showMessageDialog(null, "Selected items successfully checked out");
@@ -265,6 +281,7 @@ public class MainFrame extends javax.swing.JFrame {
         }
         ArrayList<Item> items = model.getItems();
         for (int index : listSelections) {
+            deskLog("Checked in item " + items.get(index).getName() + " from SID " + items.get(index).getCheckedOut());
             items.get(index).setCheckedOut(-1);
         }
         JOptionPane.showMessageDialog(null, "Selected items successfully checked in");
@@ -289,6 +306,7 @@ public class MainFrame extends javax.swing.JFrame {
                 todelete.add(itemnames.get(index));
             }
             for (String item : todelete) {
+                deskLog("Deleted item " + item);
                 model.removeItem(item);
             }
             updateList();
@@ -351,6 +369,22 @@ public class MainFrame extends javax.swing.JFrame {
         updateList();
     }//GEN-LAST:event_jRadioButton_inActionPerformed
 
+    private void jButton_logActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_logActionPerformed
+        try {
+            if(!Desktop.isDesktopSupported()) {
+                System.out.println("Unsupported");
+                return;
+            }
+            Desktop desktop = Desktop.getDesktop();
+            if (desklog.exists()) {
+                desktop.open(desklog);
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_jButton_logActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -379,10 +413,8 @@ public class MainFrame extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MainFrame().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new MainFrame().setVisible(true);
         });
     }
     
@@ -441,6 +473,34 @@ public class MainFrame extends javax.swing.JFrame {
         
         save();
     }
+    
+    public static void deskLog(String newline) {
+        String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
+        newline = "[" + timeStamp + "] " + newline;
+        try {
+            desklog = new File("desklog.txt");
+            if (desklog.createNewFile()) {
+              System.out.println("File created: " + desklog.getName());
+            } else {
+              System.out.println("File already exists.");
+            }
+          } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+          }
+        
+        try {
+            FileWriter myWriter = new FileWriter("desklog.txt", true);
+            myWriter.write(newline + "\n");
+            myWriter.close();
+            System.out.println("Successfully logged.");
+          } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+            }
+        
+        
+        }
     
     //
 
