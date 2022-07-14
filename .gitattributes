@@ -1,1 +1,2 @@
+CheckOutManager/app/jre/lib/modules filter=lfs diff=lfs merge=lfs -text
 app/jre/lib/modules filter=lfs diff=lfs merge=lfs -text
