@@ -3,11 +3,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package com.mycompany.checkoutmanager;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.awt.Desktop;
 import java.text.SimpleDateFormat;
 import javax.swing.*;
+
 /**
  *
  * @author mbath
@@ -15,33 +17,34 @@ import javax.swing.*;
 public class MainFrame extends javax.swing.JFrame {
 
     public static Model model;
-    
+
     public static ArrayList<Integer> listSelections;
-    
+
     private static DefaultListModel listModel = new DefaultListModel();
     private static String filterText;
     private static int filterButtons;
-    
+
     public static File desklog;
-    
+
     /**
      * Creates new form MainFrame
      */
     public MainFrame() {
         initComponents();
-        model = new Model();        
+        model = new Model();
         filterText = "";
         filterButtons = 0;
         this.listSelections = new ArrayList<>();
         updateList();
     }
+
     public MainFrame(Model model) {
         initComponents();
         this.model = model;
         filterText = "";
         filterButtons = 0;
         this.listSelections = new ArrayList<>();
-        
+
         // populate jlist with model immediately
         updateList();
         //listModel.addElement("testyyy");
@@ -259,8 +262,7 @@ public class MainFrame extends javax.swing.JFrame {
         int sid;
         try {
             sid = Integer.parseInt(sidraw);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Invalid SID entered. Aborting action.");
             return;
         }
@@ -270,6 +272,7 @@ public class MainFrame extends javax.swing.JFrame {
             items.get(index).setCheckedOut(sid);
         }
         JOptionPane.showMessageDialog(null, "Selected items successfully checked out");
+        updateList();
     }//GEN-LAST:event_jButton_outActionPerformed
 
     private void jButton_inActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_inActionPerformed
@@ -285,6 +288,7 @@ public class MainFrame extends javax.swing.JFrame {
             items.get(index).setCheckedOut(-1);
         }
         JOptionPane.showMessageDialog(null, "Selected items successfully checked in");
+        updateList();
     }//GEN-LAST:event_jButton_inActionPerformed
 
     private void jMenuItem_removeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_removeActionPerformed
@@ -299,7 +303,7 @@ public class MainFrame extends javax.swing.JFrame {
             ArrayList<String> itemnames = new ArrayList<>();
             ArrayList<String> todelete = new ArrayList<>();
             ArrayList<Item> items = model.getItems();
-            for (int i = 0; i < items.size(); i++){
+            for (int i = 0; i < items.size(); i++) {
                 itemnames.add(items.get(i).getName());
             }
             for (int index : listSelections) {
@@ -322,6 +326,7 @@ public class MainFrame extends javax.swing.JFrame {
         String name = JOptionPane.showInputDialog("New item:");
         Item newItem = new Item(name);
         model.addItem(newItem);
+        deskLog("Added item " + name);
         updateList();
     }//GEN-LAST:event_jMenuItem_addActionPerformed
 
@@ -338,11 +343,11 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField_filterPropertyChange
 
     private void jTextField_filterKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField_filterKeyTyped
-        
+
     }//GEN-LAST:event_jTextField_filterKeyTyped
 
     private void jTextField_filterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField_filterActionPerformed
-        
+
     }//GEN-LAST:event_jTextField_filterActionPerformed
 
     private void jTextField_filterKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField_filterKeyReleased
@@ -371,7 +376,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jButton_logActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_logActionPerformed
         try {
-            if(!Desktop.isDesktopSupported()) {
+            if (!Desktop.isDesktopSupported()) {
                 System.out.println("Unsupported");
                 return;
             }
@@ -379,8 +384,7 @@ public class MainFrame extends javax.swing.JFrame {
             if (desklog.exists()) {
                 desktop.open(desklog);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }//GEN-LAST:event_jButton_logActionPerformed
@@ -417,10 +421,10 @@ public class MainFrame extends javax.swing.JFrame {
             new MainFrame().setVisible(true);
         });
     }
-    
+
     // my methods here
     public static void save() {
-            try {
+        try {
             File f = new File("list.txt");
             FileOutputStream fileOut = new FileOutputStream(f);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
@@ -428,80 +432,91 @@ public class MainFrame extends javax.swing.JFrame {
             out.close();
             fileOut.close();
             System.out.printf("Serialized data is saved in /tmp/list.txt");
-         } catch (IOException i) {
+        } catch (IOException i) {
             i.printStackTrace();
-         }
-     }
-    
+        }
+    }
+
     public static void updateList() {
         listModel.clear();
         ArrayList<Item> items = model.getItems();
-        
+
         for (Item item : items) {
             if (item.getName() == null) {
                 item.setName("default");
             }
         }
-        
+
         for (Item item : items) {
             System.out.println(item.getName());
             if (item.getName().contains(filterText)) {
                 switch (filterButtons) {
-                case 0:
-                    listModel.addElement(item.getName());
-                    break;
-                case 1:
-                    if (item.getCheckedOut() != -1) {
-                        listModel.addElement(item.getName());                        
-                    }
-                    break;
-                case 2:
-                    if (item.getCheckedOut() == -1) {
-                        listModel.addElement(item.getName());                        
-                    }
-                    break;
+                    case 0:
+                        if (item.getCheckedOut() != -1) {
+                            listModel.addElement(item.getName() + " [Out by " + item.getCheckedOut() + "]");
+                        } else {
+                            listModel.addElement(item.getName());
+                        }
+                        break;
+                    case 1:
+                        if (item.getCheckedOut() != -1) {
+                            if (item.getCheckedOut() != -1) {
+                                listModel.addElement(item.getName() + " [Out by " + item.getCheckedOut() + "]");
+                            } else {
+                                listModel.addElement(item.getName());
+                            }
+                        }
+                        break;
+                    case 2:
+                        if (item.getCheckedOut() == -1) {
+                            if (item.getCheckedOut() != -1) {
+                                listModel.addElement(item.getName() + " [Out by " + item.getCheckedOut() + "]");
+                            } else {
+                                listModel.addElement(item.getName());
+                            }
+                        }
+                        break;
                 }
-                
+
             }
-                
+
         }
 //        for (int i = 0; i < items.size(); i++){
 //            if (items.get(i).getName().contains(filterText)) {
 //                listModel.addElement(items.get(i).getName());
 //            }
 //        }
-        
+
         save();
     }
-    
+
     public static void deskLog(String newline) {
         String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
         newline = "[" + timeStamp + "] " + newline;
         try {
             desklog = new File("desklog.txt");
             if (desklog.createNewFile()) {
-              System.out.println("File created: " + desklog.getName());
+                System.out.println("File created: " + desklog.getName());
             } else {
-              System.out.println("File already exists.");
+                System.out.println("File already exists.");
             }
-          } catch (IOException e) {
+        } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
-          }
-        
+        }
+
         try {
             FileWriter myWriter = new FileWriter("desklog.txt", true);
             myWriter.write(newline + "\n");
             myWriter.close();
             System.out.println("Successfully logged.");
-          } catch (IOException e) {
+        } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
-            }
-        
-        
         }
-    
+
+    }
+
     //
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
