@@ -5,6 +5,7 @@
 package com.mycompany.checkoutmanager;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import javax.swing.*;
 /**
  *
@@ -234,18 +235,47 @@ public class MainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton_outActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_outActionPerformed
-        // TODO add your handling code here:
-        for (int index : listSelections) {
-            
+        // TODO add your handling code here:        
+        if (listSelections.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "No list selections detected. Aborting action.");
+            return;
         }
+        String sidraw = JOptionPane.showInputDialog(null, "Tap or Scan the student's Student ID Card now,\n or manually type the student's Student ID Number and press Enter.", "SID Input", JOptionPane.PLAIN_MESSAGE);
+        if (sidraw == null) {
+            return;
+        }
+        if (sidraw.equals("")) {
+            JOptionPane.showMessageDialog(null, "Invalid SID entered. Aborting action.");
+            return;
+        }
+        int sid = Integer.parseInt(sidraw);
+        ArrayList<Item> items = model.getItems();
+        for (int index : listSelections) {
+            items.get(index).setCheckedOut(sid);
+        }
+        JOptionPane.showMessageDialog(null, "Selected items successfully checked out");
     }//GEN-LAST:event_jButton_outActionPerformed
 
     private void jButton_inActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_inActionPerformed
         // TODO add your handling code here:
+        //int sid = Integer.parseInt(JOptionPane.showInputDialog(null, "Tap or Scan the student's Student ID Card now,\n or manually type the student's Student ID Number and press Enter.", "SID Input", JOptionPane.PLAIN_MESSAGE));
+        if (listSelections.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "No list selections detected. Aborting action.");
+            return;
+        }
+        ArrayList<Item> items = model.getItems();
+        for (int index : listSelections) {
+            items.get(index).setCheckedOut(-1);
+        }
+        JOptionPane.showMessageDialog(null, "Selected items successfully checked in");
     }//GEN-LAST:event_jButton_inActionPerformed
 
     private void jMenuItem_removeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_removeActionPerformed
         // TODO add your handling code here:
+        if (listSelections.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "No list selections detected. Aborting action.");
+            return;
+        }
         int execute = JOptionPane.showConfirmDialog(null, "This action permanently deletes all of the currently selected items in the list. Do you wish to continue?", "Confirm", JOptionPane.YES_NO_OPTION);
         System.out.println(execute);
         if (execute == 0) {
