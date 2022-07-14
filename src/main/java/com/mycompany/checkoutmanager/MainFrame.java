@@ -17,19 +17,22 @@ public class MainFrame extends javax.swing.JFrame {
     public static ArrayList<Integer> listSelections;
     
     private static DefaultListModel listModel = new DefaultListModel();
+    private static String filterText;
     
     /**
      * Creates new form MainFrame
      */
     public MainFrame() {
         initComponents();
-        model = new Model();
+        model = new Model();        
+        filterText = "";
         this.listSelections = new ArrayList<>();
         updateList();
     }
     public MainFrame(Model model) {
         initComponents();
         this.model = model;
+        filterText = "";
         this.listSelections = new ArrayList<>();
         
         // populate jlist with model immediately
@@ -89,7 +92,24 @@ public class MainFrame extends javax.swing.JFrame {
 
         jButton_log.setText("Display Check In/Out Log");
 
-        jTextField_filter.setText("item");
+        jTextField_filter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField_filterActionPerformed(evt);
+            }
+        });
+        jTextField_filter.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jTextField_filterPropertyChange(evt);
+            }
+        });
+        jTextField_filter.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTextField_filterKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jTextField_filterKeyTyped(evt);
+            }
+        });
 
         jLabel_filter.setText("Filter:");
 
@@ -247,6 +267,24 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jList_itemsValueChanged
 
+    private void jTextField_filterPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jTextField_filterPropertyChange
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField_filterPropertyChange
+
+    private void jTextField_filterKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField_filterKeyTyped
+        
+    }//GEN-LAST:event_jTextField_filterKeyTyped
+
+    private void jTextField_filterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField_filterActionPerformed
+        
+    }//GEN-LAST:event_jTextField_filterActionPerformed
+
+    private void jTextField_filterKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField_filterKeyReleased
+        // TODO add your handling code here:
+        filterText = jTextField_filter.getText();
+        updateList();
+    }//GEN-LAST:event_jTextField_filterKeyReleased
+
     /**
      * @param args the command line arguments
      */
@@ -300,9 +338,24 @@ public class MainFrame extends javax.swing.JFrame {
     public static void updateList() {
         listModel.clear();
         ArrayList<Item> items = model.getItems();
-        for (int i = 0; i < items.size(); i++){
-            listModel.addElement(items.get(i).getName());
+        
+        for (Item item : items) {
+            if (item.getName() == null) {
+                item.setName("default");
+            }
         }
+        
+        for (Item item : items) {
+            System.out.println(item.getName());
+            if (item.getName().contains(filterText)) {
+                listModel.addElement(item.getName());
+            }
+        }
+//        for (int i = 0; i < items.size(); i++){
+//            if (items.get(i).getName().contains(filterText)) {
+//                listModel.addElement(items.get(i).getName());
+//            }
+//        }
         
         save();
     }
